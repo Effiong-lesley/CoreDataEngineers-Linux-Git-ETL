@@ -43,7 +43,7 @@ chmod +x Scripts/bash/*.sh
 
 ---
 
-## Task 1 — The ETL Script (`Scripts/bash/etl.sh`)
+## Task 1 - The ETL Script (`Scripts/bash/etl.sh`)
 
 ### Extract
 Downloads the Annual Enterprise Survey CSV from Stats NZ and saves it into a
@@ -102,7 +102,7 @@ year,Value,Units,variable_code
 
 ---
 
-## Task 2 — Scheduling with cron (daily at 12:00 AM)
+## Task 2 - Scheduling with cron (daily at 12:00 AM)
 
 cron is Linux's built-in job scheduler. A crontab line has five time fields
 followed by the command:
@@ -127,7 +127,7 @@ job (without creating duplicates) and prints the resulting crontab:
 ./Scripts/bash/install_cron.sh
 ```
 
-**Option B — manual:**
+**Option B - manual:**
 
 ```bash
 crontab -e
@@ -139,7 +139,7 @@ Verify with `crontab -l`. Use `crontab -r` to remove all jobs.
 
 ---
 
-## Task 3 — Moving CSV & JSON files (`Scripts/bash/move_csv_json.sh`)
+## Task 3 - Moving CSV & JSON files (`Scripts/bash/move_csv_json.sh`)
 
 Moves **one or more** `.csv` and `.json` files from any source folder into a
 folder named **`json_and_CSV`**, confirming every move:
