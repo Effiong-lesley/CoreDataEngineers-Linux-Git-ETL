@@ -1,4 +1,4 @@
-# CoreDataEngineers — Linux & Git Project (Bash ETL Pipeline)
+# CoreDataEngineers - Linux & Git Project (Bash ETL Pipeline)
 
 **Author:** Lesley Effiong Akpan
 **Role:** Data Engineer, CoreDataEngineers
