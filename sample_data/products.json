@@ -1,1 +1,5 @@
-[SYSTEM] read file
+[
+  {"product_id": 101, "name": "Data Pipeline Course", "price": 49.99, "in_stock": true},
+  {"product_id": 102, "name": "SQL Handbook", "price": 29.99, "in_stock": true},
+  {"product_id": 103, "name": "Cloud Cheat Sheet", "price": 9.99, "in_stock": false}
+]

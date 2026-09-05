@@ -1,1 +1,5 @@
-[SYSTEM] read file
+customer_id,name,country,signup_date
+1,Amaka Obi,Nigeria,2026-01-14
+2,John Smith,United Kingdom,2026-02-03
+3,Chen Wei,China,2026-03-21
+4,Fatima Bello,Nigeria,2026-04-09
