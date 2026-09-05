@@ -22,7 +22,7 @@ with Git.
 ├── raw/                                       # EXTRACT output
 │   ├── annual-enterprise-survey-2023-financial-year-provisional.csv
 │   └── data.csv                               # sample CSV used for the move_files.sh demo
-├── transformed/                               # TRANSFORM output
+├── Transformed/                               # TRANSFORM output
 │   └── 2023_year_finance.csv
 └── Gold/                                      # LOAD output
     └── 2023_year_finance.csv
@@ -59,7 +59,7 @@ export CSV_URL="https://www.stats.govt.nz/assets/Uploads/Annual-enterprise-surve
 ### Transform
 - Renames the column `Variable_code` to **`variable_code`**.
 - Selects only the columns **`year, Value, Units, variable_code`** (in that order).
-- Writes the result to **`transformed/2023_year_finance.csv`** and confirms it.
+- Writes the result to **`Transformed/2023_year_finance.csv`** and confirms it.
 
 > Implementation note: the source CSV contains quoted fields with embedded
 > commas (e.g. `"728,225"` in the `Value` column). A naive comma split would
@@ -80,12 +80,12 @@ file is present there.
 [2026-09-05 21:21:08] STEP 1/3 [EXTRACT] Downloading CSV from: https://www.stats.govt.nz/...
 [2026-09-05 21:21:08] STEP 1/3 [EXTRACT] SUCCESS: File confirmed in raw folder -> .../raw/annual-enterprise-survey-2023-financial-year-provisional.csv
 [2026-09-05 21:21:08] STEP 1/3 [EXTRACT] File size: 7.7M, rows: 50986
-[2026-09-05 21:21:08] STEP 2/3 [TRANSFORM] Creating transformed folder (if it does not exist)...
-[2026-09-05 21:21:10] STEP 2/3 [TRANSFORM] SUCCESS: File confirmed in transformed folder -> .../transformed/2023_year_finance.csv
+[2026-09-05 21:21:08] STEP 2/3 [TRANSFORM] Creating Transformed folder (if it does not exist)...
+[2026-09-05 21:21:10] STEP 2/3 [TRANSFORM] SUCCESS: File confirmed in Transformed folder -> .../Transformed/2023_year_finance.csv
 [2026-09-05 21:21:10] STEP 2/3 [TRANSFORM] Header is now: year,Value,Units,variable_code
 [2026-09-05 21:21:10] STEP 3/3 [LOAD] Loading 2023_year_finance.csv into the Gold folder...
 [2026-09-05 21:21:10] STEP 3/3 [LOAD] SUCCESS: File confirmed in Gold folder -> .../Gold/2023_year_finance.csv
-[2026-09-05 21:21:10]  ETL pipeline COMPLETED successfully (raw -> transformed -> Gold)
+[2026-09-05 21:21:10]  ETL pipeline COMPLETED successfully (raw -> Transformed -> Gold)
 ```
 
 Transformed output preview:
@@ -171,6 +171,6 @@ git remote add origin https://github.com/Effiong-lesley/CoreDataEngineers-Linux-
 git push -u origin main
 ```
 
-The pipeline outputs (`raw/`, `transformed/`, `Gold/`) are committed so the
+The pipeline outputs (`raw/`, `Transformed/`, `Gold/`) are committed so the
 results can be reviewed without re-running the pipeline; only cron logs and the
 `json_and_CSV/` demo output are excluded via `.gitignore`.

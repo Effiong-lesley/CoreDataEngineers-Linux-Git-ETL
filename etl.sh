@@ -8,7 +8,7 @@
 #               TRANSFORM  -> Renames the "Variable_code" column to
 #                             "variable_code" and keeps only the columns
 #                             year, Value, Units, variable_code. The result is
-#                             saved as transformed/2023_year_finance.csv
+#                             saved as Transformed/2023_year_finance.csv
 #               LOAD       -> Copies the transformed file into Gold/
 #
 #               Every step prints status information and confirms that the
@@ -43,7 +43,7 @@ PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Folder and file names used by the pipeline.
 RAW_DIR="$PROJECT_ROOT/raw"
-TRANSFORMED_DIR="$PROJECT_ROOT/transformed"
+TRANSFORMED_DIR="$PROJECT_ROOT/Transformed"
 GOLD_DIR="$PROJECT_ROOT/Gold"
 RAW_FILE="$RAW_DIR/annual-enterprise-survey-2023-financial-year-provisional.csv"
 TRANSFORMED_FILE="$TRANSFORMED_DIR/2023_year_finance.csv"
@@ -83,7 +83,7 @@ fi
 # STEP 2: TRANSFORM - rename Variable_code -> variable_code and keep only
 #         the columns: year, Value, Units, variable_code
 #===============================================================================
-log "STEP 2/3 [TRANSFORM] Creating transformed folder (if it does not exist)..."
+log "STEP 2/3 [TRANSFORM] Creating Transformed folder (if it does not exist)..."
 mkdir -p "$TRANSFORMED_DIR"
 
 log "STEP 2/3 [TRANSFORM] Selecting columns [year, Value, Units, variable_code]..."
@@ -148,9 +148,9 @@ NR == 1 {
 }
 ' "$RAW_FILE" > "$TRANSFORMED_FILE"
 
-# Confirm the transformed file was saved in the transformed folder.
+# Confirm the transformed file was saved in the Transformed folder.
 if [ -s "$TRANSFORMED_FILE" ]; then
-    log "STEP 2/3 [TRANSFORM] SUCCESS: File confirmed in transformed folder -> $TRANSFORMED_FILE"
+    log "STEP 2/3 [TRANSFORM] SUCCESS: File confirmed in Transformed folder -> $TRANSFORMED_FILE"
     log "STEP 2/3 [TRANSFORM] Header is now: $(head -n 1 "$TRANSFORMED_FILE")"
 else
     log "STEP 2/3 [TRANSFORM] FAILED: $TRANSFORMED_FILE is missing or empty. Aborting."
@@ -175,5 +175,5 @@ else
 fi
 
 log "============================================================"
-log " ETL pipeline COMPLETED successfully (raw -> transformed -> Gold)"
+log " ETL pipeline COMPLETED successfully (raw -> Transformed -> Gold)"
 log "============================================================"
