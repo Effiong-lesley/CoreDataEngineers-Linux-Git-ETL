@@ -1,2 +1,0 @@
-# This file keeps the Transformed folder in version control.
-# Run ./etl.sh to populate it with 2023_year_finance.csv.
