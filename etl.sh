@@ -8,23 +8,20 @@
 #               TRANSFORM  -> Renames the "Variable_code" column to
 #                             "variable_code" and keeps only the columns
 #                             year, Value, Units, variable_code. The result is
-#                             saved as Transformed/2023_year_finance.csv
+#                             saved as transformed/2023_year_finance.csv
 #               LOAD       -> Copies the transformed file into Gold/
 #
 #               Every step prints status information and confirms that the
 #               expected file actually exists in the expected folder.
 #
-# Configuration: The source URL is supplied through the ENVIRONMENT VARIABLE
-#                CSV_URL so the script never hard-codes the endpoint:
-#
-#                    export CSV_URL="https://example.com/data.csv"
-#                    ./etl.sh
-#
-#                If CSV_URL is not set, the script falls back to the Stats NZ
-#                Annual Enterprise Survey 2023 CSV below.
+# Configuration: The download URL is stored in a .env file in the project
+#                root (variable: csv_url). The .env file is git-ignored and
+#                must NEVER be committed. This script loads it with:
+#                    source .env
 #
 # Usage       : ./etl.sh
-# Cron        : 0 0 * * *  /path/to/etl.sh  (daily at 12:00 AM)
+# Cron        : 0 0 * * *  /path/to/etl.sh >> /path/to/cron.log 2>&1
+#               (daily at 12:00 AM, output appended to cron.log)
 #===============================================================================
 
 # --- Safety settings ---------------------------------------------------------
@@ -33,30 +30,44 @@
 # -o pipefail  a pipeline fails if ANY command in it fails
 set -euo pipefail
 
-# --- Configuration -----------------------------------------------------------
-# The URL comes from the environment variable CSV_URL (with a safe default).
-CSV_URL="${CSV_URL:-https://www.stats.govt.nz/assets/Uploads/Annual-enterprise-survey/Annual-enterprise-survey-2023-financial-year-provisional/Download-data/annual-enterprise-survey-2023-financial-year-provisional.csv}"
-
-# The project root is the folder this script lives in, resolved dynamically so
-# the script works no matter where it is launched from (important for cron).
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-
-# Folder and file names used by the pipeline.
-RAW_DIR="$PROJECT_ROOT/raw"
-TRANSFORMED_DIR="$PROJECT_ROOT/Transformed"
-GOLD_DIR="$PROJECT_ROOT/Gold"
-RAW_FILE="$RAW_DIR/annual-enterprise-survey-2023-financial-year-provisional.csv"
-TRANSFORMED_FILE="$TRANSFORMED_DIR/2023_year_finance.csv"
+# --- Working directory -------------------------------------------------------
+# Move into the directory where this script lives, so it can be run from
+# anywhere (including cron) and still find .env, raw/, transformed/ and Gold/.
+cd "$(dirname "${BASH_SOURCE[0]}")"
+PROJECT_ROOT="$(pwd)"
 
 # --- Helper ------------------------------------------------------------------
 # log(): prints a timestamped, labelled message so each step is visible
-# in the terminal and in cron log files.
+# in the terminal and in cron.log.
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
+# --- Load environment variables ----------------------------------------------
+# The download URL lives in the .env file in the project root.
+# .env is listed in .gitignore and should NEVER be committed.
+if [ ! -f "$PROJECT_ROOT/.env" ]; then
+    log "ERROR: .env file not found in $PROJECT_ROOT"
+    log "Create it with:  csv_url=\"<download-url>\""
+    exit 1
+fi
+
+# shellcheck disable=SC1091
+source "$PROJECT_ROOT/.env"
+
+# Fail loudly if .env exists but does not define csv_url.
+: "${csv_url:?ERROR: csv_url is not set. Add csv_url=\"<download-url>\" to your .env file.}"
+
+# --- Folder and file names used by the pipeline ------------------------------
+RAW_DIR="$PROJECT_ROOT/raw"
+TRANSFORMED_DIR="$PROJECT_ROOT/transformed"
+GOLD_DIR="$PROJECT_ROOT/Gold"
+RAW_FILE="$RAW_DIR/annual-enterprise-survey-2023-financial-year-provisional.csv"
+TRANSFORMED_FILE="$TRANSFORMED_DIR/2023_year_finance.csv"
+
 log "============================================================"
 log " CoreDataEngineers ETL pipeline started"
+log " Working directory: $PROJECT_ROOT"
 log "============================================================"
 
 #===============================================================================
@@ -65,10 +76,10 @@ log "============================================================"
 log "STEP 1/3 [EXTRACT] Creating raw folder (if it does not exist)..."
 mkdir -p "$RAW_DIR"
 
-log "STEP 1/3 [EXTRACT] Downloading CSV from: $CSV_URL"
+log "STEP 1/3 [EXTRACT] Downloading CSV from: $csv_url"
 # -f fail on HTTP errors, -s silent, -S show errors, -L follow redirects
 # --retry gives the download a few chances in case of a flaky network
-curl -fsSL --retry 3 --retry-delay 5 -o "$RAW_FILE" "$CSV_URL"
+curl -fsSL --retry 3 --retry-delay 5 -o "$RAW_FILE" "$csv_url"
 
 # Confirm the file was saved in the raw folder.
 if [ -s "$RAW_FILE" ]; then
@@ -83,7 +94,7 @@ fi
 # STEP 2: TRANSFORM - rename Variable_code -> variable_code and keep only
 #         the columns: year, Value, Units, variable_code
 #===============================================================================
-log "STEP 2/3 [TRANSFORM] Creating Transformed folder (if it does not exist)..."
+log "STEP 2/3 [TRANSFORM] Creating transformed folder (if it does not exist)..."
 mkdir -p "$TRANSFORMED_DIR"
 
 log "STEP 2/3 [TRANSFORM] Selecting columns [year, Value, Units, variable_code]..."
@@ -148,9 +159,9 @@ NR == 1 {
 }
 ' "$RAW_FILE" > "$TRANSFORMED_FILE"
 
-# Confirm the transformed file was saved in the Transformed folder.
+# Confirm the transformed file was saved in the transformed folder.
 if [ -s "$TRANSFORMED_FILE" ]; then
-    log "STEP 2/3 [TRANSFORM] SUCCESS: File confirmed in Transformed folder -> $TRANSFORMED_FILE"
+    log "STEP 2/3 [TRANSFORM] SUCCESS: File confirmed in transformed folder -> $TRANSFORMED_FILE"
     log "STEP 2/3 [TRANSFORM] Header is now: $(head -n 1 "$TRANSFORMED_FILE")"
 else
     log "STEP 2/3 [TRANSFORM] FAILED: $TRANSFORMED_FILE is missing or empty. Aborting."
@@ -175,5 +186,5 @@ else
 fi
 
 log "============================================================"
-log " ETL pipeline COMPLETED successfully (raw -> Transformed -> Gold)"
+log " ETL pipeline COMPLETED successfully (raw -> transformed -> Gold)"
 log "============================================================"
