@@ -1,5 +1,8 @@
-# Cron execution logs
-logs/
+# Environment variables - NEVER commit this file
+.env
+
+# Cron run log
+cron.log
 
 # Output of move_files.sh
 json_and_CSV/
